@@ -176,7 +176,7 @@ mlflow ui
 
 ```bash
 curl -X POST http://localhost:8000/predict \
-  -F "file=@dog.jpg"
+  -F "file=@tests/assets/sample_dog.jpg"
 ```
 
 ---
