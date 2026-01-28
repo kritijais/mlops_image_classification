@@ -1,2 +1,263 @@
-# MLOps_assignment2_image_classification
-This project is to classify images into cats and dogs and follow complete MLOps pipeline
+# Cats vs Dogs Image Classification
+
+## Project Overview
+
+This project implements a **complete end-to-end MLOps pipeline** for **binary image classification (Cats vs Dogs)**, covering:
+
+* Data preprocessing & splitting
+* CNN model training with augmentation
+* Experiment tracking using MLflow
+* Containerized inference service using FastAPI
+* CI/CD automation with GitHub Actions
+* Deployment using Docker Compose
+* Post-deployment monitoring, smoke tests, and evaluation
+
+---
+
+## Dataset
+
+* **Source:** Kaggle
+* **Dataset:** Dog and Cat Classification Dataset
+* **Classes:** Cats, Dogs
+* **Images:** ~25,000
+
+Raw images are standardized to **224×224 RGB** before training.
+
+---
+
+## Project Architecture
+
+```
+Raw Data (Kaggle)
+   ↓
+Preprocessing (224×224 RGB)
+   ↓
+Train / Val / Test Split (80/10/10)
+   ↓
+CNN Training + Data Augmentation
+   ↓
+MLflow Experiment Tracking
+   ↓
+Serialized Model (.pkl)
+   ↓
+FastAPI Inference Service
+   ↓
+Docker Image
+   ↓
+GitHub Container Registry (GHCR)
+   ↓
+CI (Test + Build + Push)
+   ↓
+CD (Docker Compose Deployment)
+   ↓
+Smoke Tests
+   ↓
+Monitoring & Post-Deployment Evaluation
+```
+
+---
+
+## Repository Structure
+
+```
+mlops_assignment2_image_classification/
+│
+├── data/
+│   ├── raw/                     # Kaggle dataset (DVC-tracked)
+│   ├── processed/               # 224x224 RGB images
+│   └── processed_split/         # train/val/test split
+│
+├── src/
+│   ├── data/
+│   │   ├── preprocess.py             # standardizes raw images (size, color, format)
+│   │   └── train_val_test_split.py   # organizes images into train/val/test sets 
+│   │
+│   ├── model/
+│   │   ├── cnn.py                    # simple cnn model implementation
+│   │   ├── dataset.py                # dataset loader
+│   │   ├── train.py                  # train the model, save as .pkl and experiment tracking
+│   │   └── inference.py              # inference
+│   │
+│   ├── api/
+│   │   └── app.py                    # fast api inference service
+│   │
+│   └── utils/
+│       ├── visualization.py          # confusion matrix, loss curves
+│       ├── monitoring.py             # metrics - request count and latency
+│       └── post_deploy_collector.py  # model performance tracking post deployment
+│
+├── tests/
+│   ├── test_preprocess.py            # test one data preprocessing function
+│   ├── test_inference.py             # test one model utility / inference function
+│   └── assets/
+│       └── sample_dog.jpg            # test image
+│
+├── scripts/
+│   └── smoke_test.sh                 # post-deploy smoke test script
+│
+├── artifacts/
+│   ├── cnn_model.pkl                 # saved model
+│   └── plots/                        # visualization outputs
+│
+├── docker-compose.yml
+├── Dockerfile
+├── requirements.txt
+├── .github/workflows/
+│   ├── ci.yml
+│   └── cd.yml
+└── README.md
+```
+
+---
+
+## Key Technologies Used
+
+| Category            | Tools                             |
+| ------------------- | --------------------------------- |
+| ML                  | PyTorch                           |
+| Experiment Tracking | MLflow                            |
+| API                 | FastAPI                           |
+| Containerization    | Docker                            |
+| Registry            | GitHub Container Registry (GHCR)  |
+| CI/CD               | GitHub Actions                    |
+| Deployment          | Docker Compose                    |
+| Monitoring          | In-app logging & metrics          |
+| Testing             | pytest                            |
+
+---
+
+## Model Training & Experiment Tracking
+
+* **Model:** Simple CNN (baseline)
+* **Input:** 224×224 RGB images
+* **Loss:** Cross-Entropy
+* **Optimizer:** Adam
+* **Augmentations:**
+
+  * Random crop
+  * Horizontal flip
+  * Rotation
+  * Color jitter
+
+### MLflow Logs:
+
+* Parameters (epochs, batch size, learning rate)
+* Metrics (train loss, validation loss, accuracy)
+* Artifacts:
+
+  * `cnn_model.pkl`
+  * Confusion matrix
+  * Loss curves
+
+Run training:
+
+```bash
+python -m src.model.train
+```
+
+Launch MLflow UI:
+
+```bash
+mlflow ui
+```
+
+---
+
+## Inference Service
+
+* **Framework:** FastAPI
+* **Endpoints:**
+
+  * `GET /health`
+  * `POST /predict`
+  * `GET /metrics`
+
+### Example Prediction:
+
+```bash
+curl -X POST http://localhost:8000/predict \
+  -F "file=@dog.jpg"
+```
+
+---
+
+## Containerization
+
+Build image:
+
+```bash
+docker build -t cats-dogs-inference .
+```
+
+---
+
+## Container Registry: GitHub Container Registry (GHCR)
+
+Docker images are pushed to **GitHub Container Registry**:
+
+```
+ghcr.io/<github-username>/<repo-name>/cats-dogs-inference:latest
+```
+
+Authentication is handled automatically in CI using `GITHUB_TOKEN`.
+
+---
+
+## CI/CD Pipelines (GitHub Actions)
+
+### Continuous Integration (CI)
+
+Triggered on every **push / pull request**:
+
+* Checkout repository
+* Install dependencies
+* Run unit tests (`pytest`)
+* Build Docker image
+
+### Continuous Deployment (CD)
+
+Triggered on **push to `main`**:
+
+* Pull latest image from **GHCR**
+* Deploy/update service using **Docker Compose**
+* Run post-deploy smoke tests
+
+---
+
+## Deployment with Docker Compose
+
+### Deploy
+
+```bash
+docker compose up -d
+```
+
+---
+
+## Post-Deploy Smoke Tests
+
+Automated smoke tests validate:
+
+* `/health` endpoint
+* `/predict` endpoint with a real image
+
+If any check fails, **the CD pipeline fails automatically**.
+
+---
+
+## Monitoring & Logging
+
+* Request count per endpoint
+* Average latency tracking
+* Structured logs (no images or sensitive data)
+* `/metrics` endpoint for inspection
+
+---
+
+## Post-Deployment Performance Tracking
+
+* Collect predictions + true labels (simulated or real)
+* Stored in append-only JSONL
+* Enables post-deployment accuracy evaluation
+
+---

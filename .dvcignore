@@ -1,3 +1,53 @@
-# Add patterns of files dvc should ignore, which could improve
-# the performance. Learn more at
-# https://dvc.org/doc/user-guide/dvcignore
+# ===============================
+# Code
+# ===============================
+src/
+tests/
+scripts/
+*.py
+
+# ===============================
+# Version control
+# ===============================
+.git/
+.gitignore
+
+# ===============================
+# Virtual environments
+# ===============================
+venv/
+.venv/
+
+# ===============================
+# MLflow
+# ===============================
+mlruns/
+mlartifacts/
+
+# ===============================
+# Docker & CI
+# ===============================
+Dockerfile
+docker-compose.yml
+.github/
+
+# ===============================
+# Model artifacts (not datasets)
+# ===============================
+artifacts/
+monitoring/
+
+# ===============================
+# Logs & caches
+# ===============================
+*.log
+__pycache__/
+.ipynb_checkpoints/
+.pytest_cache/
+
+# ===============================
+# OS / Editor files
+# ===============================
+.DS_Store
+.idea/
+.vscode/

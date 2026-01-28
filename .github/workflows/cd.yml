@@ -1,0 +1,50 @@
+name: CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      # -----------------------------
+      # Checkout repository
+      # -----------------------------
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # -----------------------------
+      # Login to GHCR
+      # -----------------------------
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # -----------------------------
+      # Pull latest image
+      # -----------------------------
+      - name: Pull latest Docker image
+        run: |
+          docker pull ghcr.io/${{ github.repository }}/cats-dogs-inference:latest
+
+      # -----------------------------
+      # Deploy using Docker Compose
+      # -----------------------------
+      - name: Deploy / Update service
+        run: |
+          docker compose down
+          docker compose up -d
+
+      # -----------------------------
+      # Post-deploy smoke tests
+      # -----------------------------
+      - name: Post-deploy smoke tests
+        run: |
+          sleep 10
+          bash scripts/smoke_test.sh
