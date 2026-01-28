@@ -126,6 +126,141 @@ mlops_assignment2_image_classification/
 
 ---
 
+
+## Dataset Download
+
+The raw Cats vs Dogs dataset is downloaded directly from Kaggle using `kagglehub` and normalized into a consistent directory structure expected by the preprocessing pipeline.
+
+### Download Raw Data
+
+Run the following command from the project root:
+
+```bash
+python -m src.data.data_download
+```
+
+This command will:
+
+* Download the dataset from Kaggle using `kagglehub`
+* Automatically extract the data
+* Normalize the directory structure to:
+
+```text
+data/raw/
+├── Cat/
+│   ├── 0.jpg
+│   ├── 1.jpg
+│   └── ...
+└── Dog/
+    ├── 0.jpg
+    ├── 1.jpg
+    └── ...
+```
+
+The script handles Kaggle’s original nested layout (e.g. `PetImages/`) and ensures a clean, flat structure for downstream processing.
+
+---
+
+
+### Data Preprocessing
+
+Before training, all images undergo standardized preprocessing to ensure compatibility with CNN architectures:
+
+* **Resize:** `224 × 224`
+* **Color Mode:** RGB (3 channels)
+* **Normalization:** ImageNet mean and standard deviation
+* **Format:** Converted to PyTorch tensors
+
+This preprocessing ensures:
+
+* Uniform input dimensions
+* Stable gradient behavior during training
+* Compatibility with standard CNN backbones
+
+---
+
+### Data Augmentation (Training Only)
+
+To improve generalization and reduce overfitting, the following augmentations are applied **only to the training set**:
+
+* Random horizontal flip
+* Random rotation
+* Random resized crop
+* Color jitter
+
+Validation and test sets use **deterministic transforms only**, ensuring unbiased evaluation.
+
+---
+
+### Train / Validation / Test Split
+
+The processed dataset is split using the following proportions:
+
+| Split      | Percentage |
+| ---------- | ---------- |
+| Training   | 80%        |
+| Validation | 10%        |
+| Test       | 10%        |
+
+The split is **class-balanced** and performed once to ensure reproducibility.
+
+Resulting directory structure:
+
+```text
+data/processed_split/
+├── train/
+│   ├── cats/
+│   └── dogs/
+├── val/
+│   ├── cats/
+│   └── dogs/
+└── test/
+    ├── cats/
+    └── dogs/
+```
+
+---
+
+### Data Versioning with DVC
+
+After downloading the dataset, the raw data should be tracked using **DVC**:
+
+This ensures:
+
+* Raw data is reproducible
+* Git history remains lightweight
+* CI/CD pipelines stay data-agnostic
+
+* All processed datasets and splits are tracked using **DVC**
+* Git stores only lightweight `.dvc` metadata files
+* Actual image data is stored in a DVC remote
+
+```bash
+dvc init
+dvc add data/raw
+dvc add data/processed
+dvc add data/processed_split
+```
+
+---
+
+### End-to-End Data Preparation Flow
+
+```bash
+# Download raw data
+python -m src.data.data_download
+
+# Preprocess raw images
+python -m src.data.preprocess
+
+# Create train / val / test split
+python -m src.data.train_val_test_split
+```
+
+
+---
+
+
 ## Model Training & Experiment Tracking
 
 * **Model:** Simple CNN (baseline)
@@ -159,6 +294,17 @@ Launch MLflow UI:
 
 ```bash
 mlflow ui
+```
+
+---
+
+### Model Versioning with DVC
+
+After generating the .pkl file, it should be tracked using **DVC**:
+
+```bash
+dvc init
+dvc add artifacts/cnn_model.pkl
 ```
 
 ---

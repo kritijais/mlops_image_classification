@@ -51,8 +51,16 @@ data/processed_split/
 # ===============================
 # Model artifacts
 # ===============================
-artifacts/
 monitoring/
+# Ignore actual model files
+artifacts/*.pkl
+artifacts/*.pt
+artifacts/*.h5
+
+# Allow DVC metadata
+!artifacts/*.dvc
+
+artifacts/plots/
 
 # ===============================
 # Logs
