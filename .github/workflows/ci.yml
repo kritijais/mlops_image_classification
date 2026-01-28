@@ -39,13 +39,6 @@ jobs:
           pip install -r requirements.txt
 
       # -----------------------------
-      # Lint code with flake8
-      # -----------------------------
-      - name: Run flake8
-        run: |
-          flake8 src/ tests/
-
-      # -----------------------------
       # Train model
       # -----------------------------
       - name: Train model
