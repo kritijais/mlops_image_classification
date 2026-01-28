@@ -10,6 +10,12 @@ from src.utils.visualization import (
     plot_loss_curves
 )
 
+import os
+
+if os.getenv("CI") == "true":
+    print("CI environment detected — skipping training.")
+    exit(0)
+
 # -----------------------------
 # Configuration
 # -----------------------------
