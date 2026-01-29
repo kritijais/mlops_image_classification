@@ -82,3 +82,5 @@ artifacts/plots/
 # Test cache
 # ===============================
 .pytest_cache/
+
+grafana-storage/
