@@ -17,3 +17,4 @@ seaborn
 python-multipart==0.0.9
 
 flake8==7.0.0
+prometheus-client

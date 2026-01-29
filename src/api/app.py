@@ -1,3 +1,5 @@
+from prometheus_client import Counter, Histogram, generate_latest
+from fastapi.responses import Response
 from fastapi import FastAPI, UploadFile, File, Request
 from PIL import Image
 import io
@@ -15,6 +17,18 @@ app = FastAPI(
 )
 
 model, classes = load_model(MODEL_PATH)
+
+PROM_REQUEST_COUNT = Counter(
+    "http_requests_total",
+    "Total HTTP requests",
+    ["path", "method"]
+)
+
+PROM_REQUEST_LATENCY = Histogram(
+    "http_request_latency_seconds",
+    "Request latency",
+    ["path"]
+)
 
 # -----------------------------
 # Health Check
@@ -43,11 +57,22 @@ async def monitoring_middleware(request: Request, call_next):
     response = await call_next(request)
     latency = time.time() - start_time
 
+    # Custom monitoring
     record_request(
         path=request.url.path,
         latency=latency,
         status_code=response.status_code
     )
+
+    # Prometheus metrics
+    PROM_REQUEST_COUNT.labels(
+        path=request.url.path,
+        method=request.method
+    ).inc()
+
+    PROM_REQUEST_LATENCY.labels(
+        path=request.url.path
+    ).observe(latency)
 
     return response
 
@@ -56,13 +81,7 @@ async def monitoring_middleware(request: Request, call_next):
 # -----------------------------
 @app.get("/metrics")
 def metrics():
-    output = {}
-    for path in REQUEST_COUNT:
-        count = REQUEST_COUNT[path]
-        avg_latency = TOTAL_LATENCY[path] / max(count, 1)
-
-        output[path] = {
-            "request_count": count,
-            "avg_latency_ms": round(avg_latency * 1000, 2)
-        }
-    return output
+    return Response(
+        generate_latest(),
+        media_type="text/plain"
+    )

@@ -7,6 +7,7 @@ This project implements a **complete end-to-end MLOps pipeline** for **binary im
 * Data preprocessing & splitting
 * CNN model training with augmentation
 * Experiment tracking using MLflow
+* Data and Model artifact versioning with DVC
 * Containerized inference service using FastAPI
 * CI/CD automation with GitHub Actions
 * Deployment using Docker Compose
@@ -69,7 +70,8 @@ mlops_assignment2_image_classification/
 │
 ├── src/
 │   ├── data/
-│   │   ├── preprocess.py             # standardizes raw images (size, color, format)
+│   │   ├── data_download.py          # downloads dataset
+│   │   └── preprocess.py             # standardizes raw images (size, color, format)
 │   │   └── train_val_test_split.py   # organizes images into train/val/test sets 
 │   │
 │   ├── model/
@@ -105,6 +107,8 @@ mlops_assignment2_image_classification/
 ├── .github/workflows/
 │   ├── ci.yml
 │   └── cd.yml
+├── .gitignore
+├── .dvcignore
 └── README.md
 ```
 
@@ -116,6 +120,7 @@ mlops_assignment2_image_classification/
 | ------------------- | --------------------------------- |
 | ML                  | PyTorch                           |
 | Experiment Tracking | MLflow                            |
+| Data Versioning     | DVC                               |
 | API                 | FastAPI                           |
 | Containerization    | Docker                            |
 | Registry            | GitHub Container Registry (GHCR)  |
@@ -141,9 +146,8 @@ python -m src.data.data_download
 
 This command will:
 
-* Download the dataset from Kaggle using `kagglehub`
-* Automatically extract the data
-* Normalize the directory structure to:
+* Download the dataset from Kaggle via kagglehub
+* Extract and normalize the structure to:
 
 ```text
 data/raw/
@@ -156,8 +160,6 @@ data/raw/
     ├── 1.jpg
     └── ...
 ```
-
-The script handles Kaggle’s original nested layout (e.g. `PetImages/`) and ensures a clean, flat structure for downstream processing.
 
 ---
 
@@ -241,7 +243,6 @@ python -m src.data.train_val_test_split
 After downloading the dataset, the raw data should be tracked using **DVC**:
 
 This ensures:
-
 * Raw data is reproducible
 * Git history remains lightweight
 * CI/CD pipelines stay data-agnostic
@@ -329,7 +330,6 @@ Open:
 http://127.0.0.1:8000/docs
 
 
-
 ### Example Prediction:
 
 ```bash
@@ -345,6 +345,8 @@ Build image:
 
 ```bash
 docker build -t cats-dogs-inference .
+or
+docker build -t ghcr.io/<github-username>/cats-dogs-inference:latest .
 ```
 
 ---
@@ -389,6 +391,10 @@ Triggered on **push to `main`**:
 ```bash
 docker compose up -d
 ```
+
+The API will be accessible at:
+
+http://localhost:8000
 
 ---
 
