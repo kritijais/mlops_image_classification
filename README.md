@@ -131,6 +131,23 @@ mlops_assignment2_image_classification/
 
 ---
 
+## Installation Steps
+Create a virtual environment (optional but recommended):
+
+```bash
+python -m venv env
+source env/bin/activate  # On macOS/Linux
+# or env\Scripts\activate on Windows
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
 
 ## Dataset Download
 
