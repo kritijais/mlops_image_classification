@@ -26,6 +26,13 @@ Raw images are standardized to **224×224 RGB** before training.
 
 ---
 
+## Project Video URL
+
+https://youtu.be/_VCGnujM4uw
+
+
+---
+
 ## Project Architecture
 
 ```
@@ -448,7 +455,7 @@ If any check fails, **the CD pipeline fails automatically**.
 
 To access Prometheus:
 1. Ensure Docker Compose is running (`docker compose up -d`)
-2. Open Grafana at http://localhost:9090
+2. Open Prometheus at http://localhost:9090
 
 ### Grafana Dashboards
 
