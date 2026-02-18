@@ -1,0 +1,60 @@
+name: CD Pipeline
+
+on:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      # -----------------------------
+      # Checkout repository
+      # -----------------------------
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # -----------------------------
+      # Login to GHCR
+      # -----------------------------
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # -----------------------------
+      # Pull latest image
+      # -----------------------------
+      - name: Pull latest Docker image
+        run: |
+          docker pull ghcr.io/${{ github.repository }}/cats-dogs-inference:latest
+
+      # -----------------------------
+      # Deploy using Docker Compose
+      # -----------------------------
+      - name: Deploy / Update service
+        run: |
+          docker compose down
+          docker compose up -d
+
+      # GitHub Actions cannot verify localhost services directly, so we skip smoke tests here.
+      # # -----------------------------
+      # # Post-deploy smoke tests
+      # # -----------------------------
+      # - name: Post-deploy smoke tests
+      #   run: |
+      #     sleep 10
+      #     bash scripts/smoke_test.sh
+
+      # -----------------------------
+      # Post-deployment performance tracking
+      # -----------------------------
+      - name: Post-deployment performance tracking
+        run: |
+          python -m src.utils.post_deploy_collector

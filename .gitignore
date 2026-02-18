@@ -1,0 +1,86 @@
+# ===============================
+# Python
+# ===============================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.eggs/
+
+# ===============================
+# Virtual Environments
+# ===============================
+venv/
+.venv/
+env/
+ENV/
+
+# ===============================
+# IDEs & Editors
+# ===============================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ===============================
+# OS files
+# ===============================
+.DS_Store
+Thumbs.db
+
+# ===============================
+# Jupyter
+# ===============================
+.ipynb_checkpoints/
+
+# ===============================
+# MLflow
+# ===============================
+mlruns/
+mlartifacts/
+
+# ===============================
+# Data (handled by DVC)
+# ===============================
+data/raw/
+data/processed/
+data/processed_split/
+
+# ===============================
+# Model artifacts
+# ===============================
+monitoring/
+# Ignore actual model files
+artifacts/*.pkl
+artifacts/*.pt
+artifacts/*.h5
+
+# Allow DVC metadata
+!artifacts/*.dvc
+
+artifacts/plots/
+
+# ===============================
+# Logs
+# ===============================
+*.log
+
+# ===============================
+# Docker
+# ===============================
+*.tar
+
+# ===============================
+# Environment variables
+# ===============================
+.env
+.env.*
+
+# ===============================
+# Test cache
+# ===============================
+.pytest_cache/
+
+grafana-storage/
