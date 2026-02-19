@@ -26,12 +26,20 @@ Raw images are standardized to **224×224 RGB** before training.
 
 ---
 
+
+## Github URL
+
+https://github.com/kritijais/mlops_image_classification
+
+---
+
+
 ## Project Video URL
 
 https://youtu.be/_VCGnujM4uw
 
-
 ---
+
 
 ## Project Architecture
 
@@ -281,6 +289,75 @@ dvc add data/raw
 dvc add data/processed
 dvc add data/processed_split
 ```
+
+### Configure DVC Remote Storage
+
+**We are using local remote for this project but in real world we can use S3/Azure etc storage**
+
+```bash
+mkdir dvc_storage
+dvc remote add -d storage dvc_storage
+```
+
+This creates:
+
+```
+.dvc/config
+dvc_storage/
+```
+
+Config:
+
+```ini
+['core']
+    remote = storage
+
+['remote "storage"']
+    url = dvc_storage
+```
+
+---
+
+### Push data to DVC remote
+
+```bash
+dvc push
+```
+
+This uploads raw and processed datasets to the configured storage.
+
+---
+
+### Pull data
+
+If datasets are missing:
+
+```bash
+dvc pull
+```
+
+This reconstructs:
+
+```
+data/raw
+data/processed
+data/processed_split
+```
+
+using the metadata files.
+
+---
+
+### CI/CD Integration
+
+Before model training or inference, CI pipelines must restore data:
+
+```bash
+pip install dvc
+dvc pull
+```
+
+This ensures pipelines remain **data-agnostic** while still reproducible.
 
 ---
 
