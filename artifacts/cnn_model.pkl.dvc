@@ -1,5 +1,5 @@
 outs:
-- md5: 06dd1054a710231ed8d03f0e7e40d116
+- md5: 2de4495ffbce93fa3c36cab9b517736b
   size: 95633582
   hash: md5
   path: cnn_model.pkl
