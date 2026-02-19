@@ -292,7 +292,7 @@ dvc add data/processed_split
 
 ### Configure DVC Remote Storage
 
-**We are using local remote for this project but in real world we can use S3/Azure storage**
+**We are using local remote for this project but in real world we can use S3/Azure etc storage**
 
 ```bash
 mkdir dvc_storage
