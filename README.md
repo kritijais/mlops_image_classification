@@ -1,5 +1,15 @@
 # Cats vs Dogs Image Classification
 
+## Group - 30
+| BITS-ID | Name | Contribution |
+|---|---|---|
+| ADITYA VENKAT AMANCHARLA | 2024AA05474 | 100% |
+| CHAKRALA ADITHYA | 2024AA05587 | 100% |
+| KRITI JAISWAL | 2024AA05696	| 100% |
+| VENUGOPAL VARANASI | 2024AB05276 | 100% |
+| SAMBHAW | 2024AA05245 | 100% |
+ 
+
 ## Project Overview
 
 This project implements a **complete end-to-end MLOps pipeline** for **binary image classification (Cats vs Dogs)**, covering:
